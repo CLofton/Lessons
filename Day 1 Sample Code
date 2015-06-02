@@ -1,0 +1,164 @@
+<?php
+include('articles_functions.php');
+include('mysql.php');
+
+$db = init_db();
+
+#$articles = loadArticles();
+if (isset($_GET['id'])) {$id = $_GET['id'];}
+else { $id="";}
+
+
+
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    delete_article_from_db ($db, $id);
+}
+
+# 11. Make a Form to add a new Blog Article.
+# form added to the bottom
+
+
+
+/*$articles = array(
+    array(
+        'title' => 'My Blog Article',
+        'author' => 'Ryan',
+        'date' => 'Mar 10, 2015',
+        'content' => '<p>This is my first blog article so I\'m a little nervous. Blogs seem really good and hopefully there will be more to come. Ok, here goes...</p>'
+    ),
+    array(
+        'title' => 'Other Blog Article',
+        'author' => 'Mark',
+        'date' => 'Mar 12, 2015',
+        'content' => '<p>SxSW is here. Ughhhh..... I mean YEAH!!! Good for the economy! Bad for traffic...</p>'
+    ),
+    array(
+        'title' => 'Went Camping',
+        'author' => 'Other Author',
+        'date' => 'Mar 13, 2015',
+        'content' => 'I went camping and got chased by a bear.'
+    )
+);
+*/
+if (count($_POST) > 0
+    && $_POST['title'] != ""
+    && $_POST['author'] != ""
+    && $_POST['content'] != "") {
+    # if statement to update the edited article
+    if (isset($_POST['edited'])) {
+        $id = $_POST['edited'];
+        unset($_POST['edited']);
+        save_existing_article_to_db($db, $_POST, $id);
+	#$pos = findArticlePosById($articles, $id);
+        #$articles[$pos] = $_POST;
+    } else {
+        $article = $_POST;
+        save_article_to_db($db, $article);
+    }
+}
+$articles = load_articles_from_db($db);
+# need to figure out what this else if statement should beelseif () {
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chris's Blog</title>
+    <link href="/123.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+            <script>
+            function deleteIfSure(link) {
+                pressedOK = confirm('You are about to delete the selected article.')
+                if(pressedOK){
+                    document.location = link;
+                }
+        }
+    </script>
+    <style>
+        a:link {
+            color: rgb(150,150,150);
+            background-color:transparent;
+            text-decoration:none;
+        }
+        a:visited {
+            color: rgb(150,150,150);
+            background-color:transparent;
+            text-decoration:none;
+        }
+        a:hover {
+            color: white;
+            background-color:transparent;
+            text-decoration:none;
+        }
+        a:active {
+            color: white;
+            background-color:transparent;
+            text-decoration:none;
+        }
+        body {
+            margin-bottom: 20em;
+        }
+        #article-form .form-field {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+        #article-form textarea {
+            width: 80%;
+            height: 10em;
+        }
+    </style>
+
+</head>
+<body>
+    <h1 CLASS="funkyclass" ALIGN="center" id="top">Chris's Blog</h1>
+    <div align="center">
+        <?php
+
+        if (file_exists('articles.file') && count($articles)>1) {
+        ?>
+        <h2>Previous Entries</h2>
+        <ul>
+            <?php
+            foreach ($articles as $article) {
+                $id = $article['article_id'];
+                ?>
+                <li>
+                    <a href="#<?php echo $id; ?>"><?php echo $article['title'] ?></a>
+                </li>
+            <?php
+            }
+            }
+    ?>
+</ul>
+
+<?php # echo all the $articles using a foreach loop ?>
+<?php
+foreach ($articles as $article) {
+    echoArticle($article);
+}
+?>
+
+<h2>Write a new Article!</h2>
+<form id="article-form" action="/blogproject2.php" method="post">
+    <div class="form-row">
+        <label for="title">Title:</label><br>
+        <input name="title">
+    </div><br>
+    <div class="form-row" id="author-date-fields">
+        <div>
+            <label for="author">Author:</label><br>
+            <input name="author">
+        </div>
+    </div><br>
+    <div class="form-row">
+        <label for="content">Content:</label><br>
+                <textarea name="content">
+                </textarea>
+    </div><br>
+    <div class="form-row">
+        <input type="submit" value="Publish">
+    </div>
+</form>
+</body>
+</html>
